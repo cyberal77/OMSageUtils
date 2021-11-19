@@ -29,7 +29,10 @@ type
 
 implementation
 
-{ TInfoLibreLigneDoc<T> }
+uses
+  System.Variants;
+
+{ TInfoLibreLigneDoc }
 
 constructor TInfoLibreLigneDoc.Create(AIPMDocument: IPMDocument;
   AIntituleInfoLibre: string);
@@ -54,9 +57,11 @@ procedure TInfoLibreLigneDoc.SetValue(const Value: OleVariant; BeforeLineCreated
 var
   Idx: integer;
 begin
-  Idx := FIPMDocument.Document.FactoryDocumentLigne.List.Count;
-  if (BeforeLineCreated) then Inc(Idx);
-  FDictionary.AddOrSetValue(Idx, Value);
+  if (Value <> Unassigned) then begin
+    Idx := FIPMDocument.Document.FactoryDocumentLigne.List.Count;
+    if (BeforeLineCreated) then Inc(Idx);
+    FDictionary.AddOrSetValue(Idx, Value);
+  end;
 end;
 
 procedure TInfoLibreLigneDoc.ValidateValues;
