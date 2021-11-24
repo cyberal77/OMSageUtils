@@ -220,8 +220,10 @@ begin
     PlanAna := ACpta.FactoryAnalytique.ReadIntitule(APlan);
     if (ACANum <> '') then begin
       if (ACpta.FactoryCompteA.ExistNumero(PlanAna,ACANum)) then
-        Result := ACpta.FactoryCompteA.ReadNumero(PlanAna, ACANum);
-      end else Result := nil;
+        Result := ACpta.FactoryCompteA.ReadNumero(PlanAna, ACANum)
+      else
+        Result := nil;
+    end else Result := nil;
   except
     Result := nil;
   end;
