@@ -19,7 +19,11 @@
     Objets100cLib_V600
   {$ELSEIF DEFINED(SAGE100C_V700)}
     Objets100cLib_V700
-  {$ELSE}
+  {$ELSEIF DEFINED(SAGE100C_V720)}
     Objets100cLib_V720
+  {$ELSEIF DEFINED(SAGE100C_V800)}
+    Objets100cLib_V800
+  {$ELSE}
+    Objets100cLib_V805
   {$IFEND}
 {$ENDIF}
