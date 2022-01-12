@@ -24,6 +24,6 @@
   {$ELSEIF DEFINED(SAGE100C_V800)}
     Objets100cLib_V800
   {$ELSE}
-    Objets100cLib_V805
+    Objets100cLib_V800
   {$IFEND}
 {$ENDIF}
