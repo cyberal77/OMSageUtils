@@ -3,7 +3,7 @@ unit OMSage.Utils;
 interface
 
 uses
-  IniFiles, classes, {$INCLUDE OmSageLib.inc};
+  System.IniFiles, System.classes, WinApi.ActiveX, {$INCLUDE OmSageLib.inc};
 
 procedure CreateSageCialApplication(var ASCial: IBSCialApplication3; const AVersion: string = '');
 procedure CreateSageCptaApplication(var ASCpta: IBSCptaApplication3; const AVersion: string = '');
@@ -43,6 +43,10 @@ function getArticle(ACial: IBSCIalApplication3; const AR_Ref: string): IBOArticl
 
 // Fonction Compta
 function getCurrentExercice(ACpta: IBSCptaApplication3; var DateDeb, DateFin: TDate): integer;
+
+// Converts
+function getSageDbTypeDocument(const OMTypeDocument: TOleEnum): integer;
+function getOMTypeDocument(const SageDbTypeDocument: integer): TOleEnum;
 
 implementation
 
@@ -217,6 +221,7 @@ var
 begin
   // Analytique;
   try
+    ACANum := UpperCase(ACANum);
     PlanAna := ACpta.FactoryAnalytique.ReadIntitule(APlan);
     if (ACANum <> '') then begin
       if (ACpta.FactoryCompteA.ExistNumero(PlanAna,ACANum)) then
@@ -327,8 +332,8 @@ end;
 
 function getArticle(ACial: IBSCIalApplication3; const AR_Ref: string): IBOArticle3;
 begin
-  if ACial.FactoryArticle.ExistReference(AR_Ref) then begin
-    Result := ACial.FactoryArticle.ReadReference(AR_Ref);
+  if ACial.FactoryArticle.ExistReference(UpperCase(AR_Ref)) then begin
+    Result := ACial.FactoryArticle.ReadReference(UpperCase(AR_Ref));
   end else
     Result := nil;
 end;
@@ -353,6 +358,99 @@ begin
       Dec(Result);
       C := False;
     end;
+  end;
+end;
+
+// Converts
+function getSageDbTypeDocument(const OMTypeDocument: TOleEnum): integer;
+begin
+  case OMTypeDocument of
+    // Ventes
+    DocumentTypeVenteDevis:             Result := 0;
+    DocumentTypeVenteCommande:          Result := 1;
+    DocumentTypeVentePrepaLivraison:    Result := 2;
+    DocumentTypeVenteLivraison:         Result := 3;
+    DocumentTypeVenteReprise:           Result := 4;
+    DocumentTypeVenteAvoir:             Result := 5;
+    DocumentTypeVenteFacture:           Result := 6;
+    DocumentTypeVenteFactureCpta:       Result := 7;
+    DocumentTypeVenteArchive:           Result := 8;
+    // Achats
+    DocumentTypeAchatDemande:           Result := 10;
+    DocumentTypeAchatCommande:          Result := 11;
+    DocumentTypeAchatCommandeConf:      Result := 12;
+    DocumentTypeAchatLivraison:         Result := 13;
+    DocumentTypeAchatReprise:           Result := 14;
+    DocumentTypeAchatAvoir:             Result := 15;
+    DocumentTypeAchatFacture:           Result := 16;
+    DocumentTypeAchatFactureCpta:       Result := 17;
+    DocumentTypeAchatArchive:           Result := 18;
+    // Stocks
+    DocumentTypeStockMouvIn:            Result := 20;
+    DocumentTypeStockMouvOut:           Result := 21;
+    DocumentTypeStockDeprec:            Result := 22;
+    DocumentTypeStockVirement:          Result := 23;
+    DocumentTypeStockPreparation:       Result := 24;
+    DocumentTypeStockOrdreFabrication:  Result := 25;
+    DocumentTypeStockFabrication:       Result := 26;
+    DocumentTypeStockArchive:           Result := 27;
+    // Internes
+    DocumentTypeInterne1:               Result := 40;
+    DocumentTypeInterne2:               Result := 41;
+    DocumentTypeInterne3:               Result := 42;
+    DocumentTypeInterne4:               Result := 43;
+    DocumentTypeInterne5:               Result := 44;
+    DocumentTypeInterne6:               Result := 45;
+    DocumentTypeInterneArchive:         Result := 46;
+    DocumentTypeInterne7:               Result := 47;
+  else
+    raise Exception.Create('Le type de document passé en paramètre n''existe pas');
+  end;
+end;
+
+function getOMTypeDocument(const SageDbTypeDocument: integer): TOleEnum;
+begin
+  case SageDbTypeDocument of
+    // Ventes
+    0:  Result := DocumentTypeVenteDevis;
+    1:  Result := DocumentTypeVenteCommande;
+    2:  Result := DocumentTypeVentePrepaLivraison;
+    3:  Result := DocumentTypeVenteLivraison;
+    4:  Result := DocumentTypeVenteReprise;
+    5:  Result := DocumentTypeVenteAvoir;
+    6:  Result := DocumentTypeVenteFacture;
+    7:  Result := DocumentTypeVenteFactureCpta;
+    8:  Result := DocumentTypeVenteArchive;
+    // Achats
+    10: Result := DocumentTypeAchatDemande;
+    11: Result := DocumentTypeAchatCommande;
+    12: Result := DocumentTypeAchatCommandeConf;
+    13: Result := DocumentTypeAchatLivraison;
+    14: Result := DocumentTypeAchatReprise;
+    15: Result := DocumentTypeAchatAvoir;
+    16: Result := DocumentTypeAchatFacture;
+    17: Result := DocumentTypeAchatFactureCpta;
+    18: Result := DocumentTypeAchatArchive;
+    // Stocks
+    20: Result := DocumentTypeStockMouvIn;
+    21: Result := DocumentTypeStockMouvOut;
+    22: Result := DocumentTypeStockDeprec;
+    23: Result := DocumentTypeStockVirement;
+    24: Result := DocumentTypeStockPreparation;
+    25: Result := DocumentTypeStockOrdreFabrication;
+    26: Result := DocumentTypeStockFabrication;
+    27: Result := DocumentTypeStockArchive;
+    // Internes
+    40: Result := DocumentTypeInterne1;
+    41: Result := DocumentTypeInterne2;
+    42: Result := DocumentTypeInterne3;
+    43: Result := DocumentTypeInterne4;
+    44: Result := DocumentTypeInterne5;
+    45: Result := DocumentTypeInterne6;
+    46: Result := DocumentTypeInterneArchive;
+    47: Result := DocumentTypeInterne7;
+  else
+    raise Exception.Create('Le type de document passé en paramètre n''existe pas');
   end;
 end;
 
