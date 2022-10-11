@@ -51,16 +51,16 @@ function getOMTypeDocument(const SageDbTypeDocument: integer): TOleEnum;
 implementation
 
 uses
-  SysUtils, UCipher, ComObj, Forms;
+  SysUtils, Execute.Win.CryptString, ComObj;
 
 function getOMContext(const AVersion: string): OleVariant;
 var
   ManifestFileName: string;
 begin
-  ManifestFileName := Format('%s\OM\Objets100c-v%s.manifest',[ExtractFilePath(Application.ExeName), AVersion]);
+  ManifestFileName := Format('%s\OM\Objets100c-v%s.manifest',[ExtractFilePath(ParamStr(0)), AVersion]);
   try
     Result := CreateOleObject('Microsoft.Windows.ActCtx');
-    if FileExists(ManifestFileName) then 
+    if FileExists(ManifestFileName) then
       Result.Manifest := ManifestFileName;
   except
     Result := false;
@@ -104,7 +104,7 @@ begin
     GescoFileName := AIni.ReadString(ASection,'CialFileName','C:\Users\Public\Documents\Sage\iGestion commerciale\Bijou.gcm');
     if (AUsername = '') then begin
       Username := AIni.ReadString(ASection,'Username','<Administrateur>');
-      Password := XORDecode(AIni.ReadString(ASection,'Password',''));
+      Password := DecryptStringBase64(AIni.ReadString(ASection,'Password',''));
     end else begin
       Username := AUsername;
       Password := APassword;
@@ -126,7 +126,7 @@ begin
     CptaFileName := AIni.ReadString(ASection,'CptaFileName','C:\Users\Public\Documents\Sage\iGestion commerciale\Bijou.mae');
     if (AUsername = '') then begin
       Username := AIni.ReadString(ASection,'Username','<Administrateur>');
-      Password := XORDecode(AIni.ReadString(ASection,'Password',''));
+      Password := DecryptStringBase64(AIni.ReadString(ASection,'Password',''));
     end else begin
       Username := AUsername;
       Password := APassword;
