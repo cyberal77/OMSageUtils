@@ -2,8 +2,12 @@ unit Sage.Integration;
 
 interface
 
+uses
+  System.Classes;
+
 type
   TSageApplication = (saCial, saCpta, saMopa);
+  TSageBookmarks = TStringList; // TStringList For Key Value Storage (Key is Bookmark name, Value is Path FileName
 
 // Records for parameters
   TSageExternalProgExecutable = record
@@ -21,6 +25,9 @@ function GetSageAppVersion(const SageApplication: TSageApplication): string;
 // Fonction add
 function SageAddExternalProgramExecutable(const SageApplication: TSageApplication;
                                 Parameters: TSageExternalProgExecutable): boolean;
+
+// Fonction Read
+function SageReadBookmarks(const SageApplication: TSAgeApplication; var BookmarkList: TSageBookmarks): boolean;
 
 const
   // Type
@@ -58,8 +65,7 @@ uses
   System.IOUtils,
   WinApi.Windows,
   Winapi.TlHelp32,
-  Win.Registry,
-  System.Classes;
+  Win.Registry;
 
 const
   SageKeys: array [0..2] of string = ('Gestion Commerciale 100c', 'Comptabilité 100c', 'Moyens de paiement 100c');
@@ -247,6 +253,39 @@ begin
     end;
   end else
     raise Exception.Create('Le programme Sage est en cours d''execution');
+end;
+
+function SageReadBookmarks(const SageApplication: TSAgeApplication; var BookmarkList: TSageBookmarks): boolean;
+var
+  Reg: TRegistry;
+  ProgKey: string;
+  KeyList: TStringList;
+  Idx: Integer;
+begin
+  Result := False;
+  Reg := TRegistry.Create();
+  KeyList := TStringList.Create();
+  ProgKey := Format(HKCURootKey, [SageKeys[Ord(SageApplication)], GetSageAppVersion(SageApplication)]);
+  ProgKey := TPath.Combine(ProgKey, 'Favoris');
+  if (BookmarkList = nil) then BookmarkList := TSageBookmarks.Create();
+  BookmarkList.Clear();
+  try
+    if (Reg.OpenKey(ProgKey, False)) then begin
+      Reg.GetKeyNames(KeyList);
+      Reg.CloseKey;
+      for Idx := 0 to KeyList.Count - 1 do begin
+        Reg.OpenKey(TPath.Combine(ProgKey,KeyList.Strings[Idx]),False);
+        BookmarkList.AddPair(Reg.ReadString('Name'),Reg.ReadString('Path'));
+        Reg.CloseKey();
+      end;
+
+      Result := KeyList.Count > 0;
+
+    end;
+  finally
+    Reg.Free;
+    KeyList.Free;
+  end;
 end;
 
 
